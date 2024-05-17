@@ -4,6 +4,7 @@
     <title>The Mojave at War</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="icon" type="image/x-icon" href="static/favicon.png">
   </head>
   <body>
     <main>
@@ -11,13 +12,45 @@
       </div>
     </main>
 	  <script>
+      var townMap = L.icon({
+        iconUrl: 'static/town_icon.png',
+        iconSize: [40, 40],
+        iconAnchor: [0, 30], // Adjusted to center the icon
+        popupAnchor: [20, -20] // Adjusted to align the popup with the top of the icon
+    });
+
+      locationsToAdd = [
+        {
+          'icon': townMap,
+          'location': [0.32301610604756553, 0.6282806396484376],
+          'text': 'Novac'
+        }
+      ]
+      
       var map = L.map('map',{
         zoomControl: true,
         maxZoom: 13,
         minZoom: 9
-      }).setView([1.3, 0.5], 10);
+      }).setView([1.3, 0.5], 10)
 
-      var imageOverlay = L.imageOverlay('static/basemap.png',[[0, 0], [1, 1]]).addTo(map);
+      var imageOverlay = L.imageOverlay('static/basemap.png',[[0, 0], [1, 1]]).addTo(map)
+
+      map.on('click', function(ev){
+        var latlng = map.mouseEventToLatLng(ev.originalEvent)
+        console.log(`[${latlng.lat}, ${latlng.lng}]`)
+      })
+
+      locationsToAdd.forEach(location => {
+        let popup = L.popup({autoPan: false})
+                    .setContent(location.text)
+        marker = L.marker(location.location, { icon: location.icon }).addTo(map).bindPopup(popup)
+         marker.on('mouseover', function (e) {
+            this.openPopup();
+        });
+        marker.on('mouseout', function (e) {
+            this.closePopup();
+        });
+      })
     </script>
     <style>
       body, html{
